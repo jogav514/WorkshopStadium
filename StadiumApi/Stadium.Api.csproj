@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Stadium.Shared\Stadium.Shared.csproj" />
+    <ProjectReference Include="..\Stadium.Web\Stadium.Web.csproj" />
   </ItemGroup>
 
 </Project>

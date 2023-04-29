@@ -22,5 +22,7 @@ namespace Stadium.Shared.Entities
         [Display(Name = "Porteria")]
         [MaxLength(100, ErrorMessage = "El campo {0} debe tener máximo {1} caractéres.")]
         public string? Entrance { get; set; }
+
+        
     }
 }
