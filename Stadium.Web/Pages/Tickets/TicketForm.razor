@@ -1,42 +1,58 @@
-﻿@using CurrieTechnologies.Razor.SweetAlert2;
-@inject SweetAlertService sweetAlertService
+﻿@inject SweetAlertService sweetAlertService
 
-<NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation"></NavigationLock>
-<EditForm Model="Ticket" OnValidSubmit="OnValidSubmit">
-    <DataAnnotationsValidator />
-    <div class="mb-3">
-        <label>Datos de la boleta:</label>
-        <div>
-            <InputSelect class="form-control" @bind-Value="@SelectedEntrance">
-                @foreach (var entrance in Entrances)
-                {
-                    <option value="@entrance">@entrance</option>
-                }
-            </InputSelect>
-            <ValidationMessage For="@(() => Ticket.Entrance)" />
+
+
+@if (Ticket.Used is true)
+{
+
+    <center>
+        <h2>El boleto ya ha sido utlizado</h2>
+        <h3>Puerta de entrada: @Ticket.Entrance</h3>
+        <h3>Fecha y hora: @Ticket.Date</h3>
+        <img src="images/img1.png" width="300" />
+        <h3> <p>Lo sentimos, el boleto ha sido utilizado por alguien más, si crees que se trata de un error, por favor contacta con logistica</p></h3>
+        <a href="/tickets" class="btn btn-primary">Volver al inicio</a>
+    </center>
+
+}
+else
+{
+    <EditForm Model="Ticket" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        <div class="mb-3">
+            <label>Datos de la boleta:</label>
+            <div>
+                <InputSelect class="form-control" @bind-Value="@Ticket.Entrance">
+                    @foreach (var entrance in Entrances)
+                    {
+                        <option value="@entrance">@entrance</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => Ticket.Entrance)" />
+            </div>
+            <div>
+                <label>Fecha de la boleta:</label>
+                <InputDate Type="InputDateType.DateTimeLocal" class="form-control" @bind-Value="@Ticket.Date" />
+                <ValidationMessage For="@(() => Ticket.Date)" />
+            </div>
+
+
         </div>
 
+        <button class="btn btn-primary" type="submit">Ingresar al estadio</button>
+        <button class="btn btn-success" @onclick="ReturnAction">Regresar</button>
+    </EditForm>
+}
 
-    </div>
 
-    <button class="btn btn-primary" type="submit">INGRESAR</button>
-    <button class="btn btn-success" @onclick="ReturnAction">Regresar</button>
-</EditForm>
+
 @code {
-    private string SelectedEntrance { get; set; }
-
     private List<string> Entrances { get; } = new List<string> { "NORTE", "SUR", "ORIENTAL", "OCCIDENTAL" };
-
-
     private EditContext editContext = null!;
-
     protected override void OnInitialized()
     {
         editContext = new(Ticket);
     }
-
-
-
 
     [EditorRequired]
     [Parameter]
@@ -65,7 +81,6 @@
         {
             return;
         }
-
 
         var result = await sweetAlertService.FireAsync(new SweetAlertOptions
             {

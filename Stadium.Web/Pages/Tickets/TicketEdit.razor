@@ -3,12 +3,12 @@
 @inject NavigationManager navigationManager
 @inject IRepository repository
 @inject SweetAlertService sweetAlertService
-
-<h3>Adicionar entrada</h3>
-
+<center>
+    <h3>Control de entradas</h3>
+</center>
 @if (ticket is null)
 {
-    <p>Cargando...</p>
+    <p> </p>
 }
 else
 {
@@ -30,6 +30,8 @@ else
         {
             if (responseHTTP.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
+                var messageError = await responseHTTP.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync("Error", messageError, SweetAlertIcon.Error);
                 navigationManager.NavigateTo("tickets");
             }
             else
@@ -45,9 +47,12 @@ else
     }
 
     private async Task Edit()
+
     {
         ticket!.Used = true;
+
         var responseHTTP = await repository.Put("api/tickets", ticket);
+
 
         if (responseHTTP.Error)
         {
