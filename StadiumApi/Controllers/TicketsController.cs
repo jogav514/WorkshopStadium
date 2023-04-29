@@ -5,9 +5,8 @@ using Stadium.Shared.Entities;
 
 namespace Stadium.Api.Controllers
 {
-
     [ApiController]
-    [Route("/api/Tickets")]
+    [Route("/api/tickets")]
     public class TicketsController : ControllerBase
     {
         private readonly DataContext _context;
@@ -24,50 +23,58 @@ namespace Stadium.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post(Ticket ticket)
+        public async Task<ActionResult> Post(Ticket tickets)
         {
-            _context.Add(ticket);
+            _context.Add(tickets);
             await _context.SaveChangesAsync();
-            return Ok(ticket);
+            return Ok(tickets);
         }
+
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult> Get(int id)
+        public async Task<ActionResult> GetAsync(int id)
         {
-            var country = await _context.Tickets.FirstOrDefaultAsync(x => x.Id == id);
-            if (country is null)
+            var ticket = await _context.Tickets.FirstOrDefaultAsync(t => t.Id == id);
+            if (ticket is null)
             {
                 return NotFound();
             }
 
-            return Ok(country);
-        }
-
-        [HttpPut]
-        public async Task<ActionResult> Put(Ticket ticket)
-        {
-            _context.Update(ticket);
-            await _context.SaveChangesAsync();
             return Ok(ticket);
         }
 
-        [HttpDelete("{id:int}")]
-        public async Task<ActionResult> Delete(int id)
-        {
-            var afectedRows = await _context.Tickets
-                .Where(x => x.Id == id)
-                .ExecuteDeleteAsync();
 
-            if (afectedRows == 0)
+
+
+
+        [HttpPut]
+        public async Task<ActionResult> PutAsync(Ticket ticket)
+        {
+            _context.Update(ticket);
+            try
             {
-                return NotFound();
+
+                await _context.SaveChangesAsync();
+                return Ok(ticket);
+            }
+            catch (DbUpdateException dbUpdateException)
+            {
+                if (dbUpdateException.InnerException!.Message.Contains("duplicate"))
+                {
+                    return BadRequest("Ya existe un registro con el mismo Id.");
+                }
+                else
+                {
+                    return BadRequest(dbUpdateException.InnerException.Message);
+                }
+            }
+            catch (Exception exception)
+            {
+                return BadRequest(exception.Message);
             }
 
-            return NoContent();
         }
-
-
     }
-
 }
+
 
