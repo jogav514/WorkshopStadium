@@ -12,7 +12,7 @@ using Stadium.Api.Data;
 namespace Stadium.Api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230429155249_Db")]
+    [Migration("20230429162017_Db")]
     partial class Db
     {
         /// <inheritdoc />
